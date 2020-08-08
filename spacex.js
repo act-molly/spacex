@@ -631,63 +631,59 @@ function main() {
                 e_onpeek = create_checkbox("e-peek", ax, sy + 20, e_onpeek);
             }
         }
-    }
 
-    if (legittab) {
-        if (create_group("doubletap", sx, sy, 110)) {
-            doubletap_enable = create_checkbox("override doubletap", sx + 20, sy + 20, doubletap_enable);
-            if (doubletap_enable) {
-                doubletap_tolerance_value = create_slider("tolerance", sx + 20, sy + 35, 0, 8, doubletap_tolerance_value[1], "");
-                doubletap_shift_value = create_slider("shift", sx + 20, sy + 70, 0, 14, doubletap_shift_value[1], "");
-                Exploit.OverrideTolerance(doubletap_tolerance_value[0]);
-                Exploit.OverrideShift(doubletap_shift_value[0]);
+        if (legittab) {
+            if (create_group("doubletap", sx, sy, 110)) {
+                doubletap_enable = create_checkbox("override doubletap", sx + 20, sy + 20, doubletap_enable);
+                if (doubletap_enable) {
+                    doubletap_tolerance_value = create_slider("tolerance", sx + 20, sy + 35, 0, 8, doubletap_tolerance_value[1], "");
+                    doubletap_shift_value = create_slider("shift", sx + 20, sy + 70, 0, 14, doubletap_shift_value[1], "");
+                    Exploit.OverrideTolerance(doubletap_tolerance_value[0]);
+                    Exploit.OverrideShift(doubletap_shift_value[0]);
+                }
             }
-        }
-        if (create_group("min damage override", sx, sy + 130, 187)) {
-            ay = sy + 110 + 20;
-            minimumdamage_enable = create_checkbox("override minimum damage", sx + 20, ay + 20, minimumdamage_enable);
-            if (minimumdamage_enable) {
-                minimumdamage_keybind = create_keybind("override damage key", sx + 20, ay + 35, minimumdamage_keybind);
-                if (minimumdamage_array_selectedoption == 0) {
-                    minimumdamage_override_value_autosniper = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_autosniper[1], "hp");
-                    minimumdamage_default_value_autosniper = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_autosniper[1], "hp");
-                }
-                if (minimumdamage_array_selectedoption == 1) {
-                    minimumdamage_override_value_scout = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_scout[1], "hp");
-                    minimumdamage_default_value_scout = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_scout[1], "hp");
-                }
-                if (minimumdamage_array_selectedoption == 2) {
-                    minimumdamage_override_value_awp = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_awp[1], "hp");
-                    minimumdamage_default_value_awp = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_awp[1], "hp");
-                }
-                if (minimumdamage_array_selectedoption == 3) {
-                    minimumdamage_override_value_heavypistols = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_heavypistols[1], "hp");
-                    minimumdamage_default_value_heavypistols = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_heavypistols[1], "hp");
-                }
-                var minimumdamage_dropdown = create_dropdown("weapon", sx + 20, ay + 70, minimumdamage_array, minimumdamage_array_opened, minimumdamage_array_selectedoption);
-                if (minimumdamage_dropdown != undefined) {
-                    if (minimumdamage_dropdown == "closed") {
-                        minimumdamage_array_opened = !minimumdamage_array_opened;
-                    } else {
-                        minimumdamage_array_selectedoption = minimumdamage_dropdown;
-                        minimumdamage_array_opened = !minimumdamage_array_opened;
+            if (create_group("min damage override", sx, sy + 130, 187)) {
+                ay = sy + 110 + 20;
+                minimumdamage_enable = create_checkbox("override minimum damage", sx + 20, ay + 20, minimumdamage_enable);
+                if (minimumdamage_enable) {
+                    minimumdamage_keybind = create_keybind("override damage key", sx + 20, ay + 35, minimumdamage_keybind);
+                    if (minimumdamage_array_selectedoption == 0) {
+                        minimumdamage_override_value_autosniper = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_autosniper[1], "hp");
+                        minimumdamage_default_value_autosniper = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_autosniper[1], "hp");
+                    }
+                    if (minimumdamage_array_selectedoption == 1) {
+                        minimumdamage_override_value_scout = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_scout[1], "hp");
+                        minimumdamage_default_value_scout = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_scout[1], "hp");
+                    }
+                    if (minimumdamage_array_selectedoption == 2) {
+                        minimumdamage_override_value_awp = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_awp[1], "hp");
+                        minimumdamage_default_value_awp = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_awp[1], "hp");
+                    }
+                    if (minimumdamage_array_selectedoption == 3) {
+                        minimumdamage_override_value_heavypistols = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_heavypistols[1], "hp");
+                        minimumdamage_default_value_heavypistols = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_heavypistols[1], "hp");
+                    }
+                    var minimumdamage_dropdown = create_dropdown("weapon", sx + 20, ay + 70, minimumdamage_array, minimumdamage_array_opened, minimumdamage_array_selectedoption);
+                    if (minimumdamage_dropdown != undefined) {
+                        if (minimumdamage_dropdown == "closed") {
+                            minimumdamage_array_opened = !minimumdamage_array_opened;
+                        } else {
+                            minimumdamage_array_selectedoption = minimumdamage_dropdown;
+                            minimumdamage_array_opened = !minimumdamage_array_opened;
+                        }
                     }
                 }
             }
-        }
-        if (create_group("other", sx + 230, sy, 197)) {
-            ax = sx + 250;
-            other_forcedoubletap = create_checkbox("force doubletap", ax, sy + 20, other_forcedoubletap);
-            other_noscopedistance = create_checkbox("noscope on key", ax, sy + 40, other_noscopedistance);
-            ay = sy + 40;
-            if (other_noscopedistance) {
-                other_noscope_keybind = create_keybind("noscope key", ax, sy + 55, other_noscope_keybind);
+            if (create_group("other", sx + 230, sy, 197)) {
+                ax = sx + 250;
+                other_forcedoubletap = create_checkbox("force doubletap", ax, sy + 20, other_forcedoubletap);
+                other_noscopedistance = create_checkbox("noscope on key", ax, sy + 40, other_noscopedistance);
+                ay = sy + 40;
+                if (other_noscopedistance) {
+                    other_noscope_keybind = create_keybind("noscope key", ax, sy + 55, other_noscope_keybind);
+                }
             }
         }
-    }
-
-    if (e_onpeek && IsPeeking()) {
-
     }
 
     if (legit_triggerbot_hitchance && Input.IsKeyPressed(legit_triggerbot_hitchance_keybind)) {
@@ -746,6 +742,12 @@ function playerHurt() {
 }
 
 function ragebotFunction() {
+
+    if (e_onpeek && IsPeeking(Entity.GetLocalPlayer())) {
+        var buttons = UserCMD.GetButtons();
+        UserCMD.SetButtons(buttons | (1 << 5));
+    }
+
     if (other_forcedoubletap) {
         var reg = Exploit.GetCharge();
         if (reg < 1)
