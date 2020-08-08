@@ -32,9 +32,11 @@ var minimumdamage_override_value_scout = [0, 0];
 var minimumdamage_default_value_scout = [0, 0];
 var minimumdamage_override_value_awp = [0, 0];
 var minimumdamage_default_value_awp = [0, 0];
+var minimumdamage_override_value_heavypistols = [0, 0];
+var minimumdamage_default_value_heavypistols = [0, 0];
 var minimumdamage_array_opened = false;
 var minimumdamage_array_selectedoption = 0;
-var minimumdamage_array = ["auto sniper", "scout", "awp"];
+var minimumdamage_array = ["auto sniper", "scout", "awp", "heavy pistols"];
 var minimumdamage_keybind = 0x3A;
 var other_forcedoubletap = false;
 var other_noscopedistance = false;
@@ -50,6 +52,7 @@ var legit_triggerbot_hitchance_resetvalue = [UI.GetValue("Legit", "GENERAL", "Tr
 
 var invert_onshot = false;
 var invert_onhit = false;
+var e_onpeek = false;
 var fakelag_ramp = false;
 var fakelag_ramp_min = [0, 0];
 var fakelag_ramp_max = [0, 0];
@@ -485,6 +488,33 @@ function get_tsize(text) {
     return textsizex;
 }
 
+function IsPeeking(entity) {
+    const pos = Entity.GetEyePosition(entity);
+    const velocity = Entity.GetProp(entity, "CBasePlayer", "m_vecVelocity[0]");
+    const interval = Globals.TickInterval();
+    // this certified tranny code was written by @realapril
+    pos[0] += velocity[0] * interval * 14;
+    pos[1] += velocity[1] * interval * 14;
+    pos[2] += velocity[2] * interval * 14;
+
+    const enemies = Entity.GetEnemies();
+
+    for (var i = 0; i < enemies.length; i++) {
+        const ent = enemies[i];
+
+        if (!ent || !Entity.IsAlive(ent) || Entity.IsDormant(ent))
+            continue;
+
+        const hitbox_pos = Entity.GetHitboxPosition(ent, 0);
+
+        const frac = Trace.Line(entity, pos, hitbox_pos)[1];
+
+        if (frac > 0.88) return true;
+    }
+
+    return false;
+}
+
 function main() {
     if (Input.IsKeyPressed(0x2D) && Globals.Realtime() > globaltime + 0.2) {
         globaltime = Globals.Realtime();
@@ -523,7 +553,6 @@ function main() {
                 var config2 = Base64.decode(Convar.GetString("xbox_throttlebias"));
                 var unConfig = JSON.parse(config);
                 var deConfig = JSON.parse(config2);
-                Cheat.Print(unConfig + "\n");
                 legit_triggerbot_hitchance = unConfig.legit[0].a543f;
                 legit_triggerbot_hitchance_keybind = unConfig.legit[0].a241b;
                 legit_triggerbot_hitchance_value = [unConfig.legit[0].a612c, unConfig.legit[0].a612c / 0.59];
@@ -537,6 +566,7 @@ function main() {
                 minimumdamage_override_value_autosniper = [unConfig.ragebot[0].mdo[0].k682q, unConfig.ragebot[0].mdo[0].k682q * 1.308];
                 minimumdamage_override_value_scout = [unConfig.ragebot[0].mdo[0].k735b, unConfig.ragebot[0].mdo[0].k735b * 1.308];
                 minimumdamage_override_value_awp = [unConfig.ragebot[0].mdo[0].k208h, unConfig.ragebot[0].mdo[0].k208h * 1.308];
+                minimumdamage_override_value_heavypistols = [deConfig.extra[0].mdo[0].k814c, deConfig.extra[0].mdo[0].k814c * 1.308]
                 minimumdamage_default_autosniper = [unConfig.ragebot[0].mdo[0].k092j, unConfig.ragebot[0].mdo[0].k092j * 1.308];
                 minimumdamage_default_scout = [unConfig.ragebot[0].mdo[0].k714a, unConfig.ragebot[0].mdo[0].k714a * 1.308];
                 minimumdamage_default_awp = [unConfig.ragebot[0].mdo[0].k352m, unConfig.ragebot[0].mdo[0].k352m * 1.308];
@@ -549,7 +579,7 @@ function main() {
             }
             if (create_button("save config", bx + 95, by)) {
                 var config = '{ "ragebot":[{ "other":[{ "h092a":' + other_forcedoubletap + ', "h143p":' + other_noscopedistance + ', "h432c":' + other_noscope_keybind + ' }], "mdo":[{ "k092s":' + minimumdamage_enable + ', "k142v":' + minimumdamage_keybind + ', "k152l":' + minimumdamage_array_selectedoption + ', "k682q":' + minimumdamage_override_value_autosniper[0] + ', "k735b":' + minimumdamage_override_value_scout[0] + ', "k208h":' + minimumdamage_override_value_awp[0] + ', "k092j":' + minimumdamage_default_value_autosniper[0] + ', "k714a":' + minimumdamage_default_value_scout[0] + ', "k352m":' + minimumdamage_default_value_awp[0] + ' }], "doubletap":[{ "b334z":' + doubletap_enable + ', "b892f":' + doubletap_shift_value[0] + ', "b209a":' + doubletap_tolerance_value[0] + ' }] }], "legit":[{"a543f":' + legit_triggerbot_hitchance + ', "a241b":' + legit_triggerbot_hitchance_keybind + ', "a612c":' + legit_triggerbot_hitchance_value[0] + ', "a981p":' + legit_triggerbot_hitchance_resetvalue[0] + '}] }';
-                var configpart2 = '{ "antiaim":[{ "inversions":[{ "z452f":' + invert_onshot + ', "z152u":' + invert_onhit + ' }] }] }';
+                var configpart2 = '{ "extra":[{ "mdo":[{ "k814c":' + minimumdamage_override_value_heavypistols[0] + ', "k292x":' + minimumdamage_default_value_heavypistols[0] + ' }] }], "antiaim":[{ "inversions":[{ "z452f":' + invert_onshot + ', "z152u":' + invert_onhit + ' }] }] }';
                 var savedValue = Base64.encode(config);
                 var savedValue2 = Base64.encode(configpart2);
                 Cheat.ExecuteCommand("xbox_throttlespoof " + savedValue);
@@ -596,8 +626,9 @@ function main() {
                 invert_onhit = create_checkbox("invert on hit", sx + 20, sy + 40, invert_onhit);
             }
 
-            if (create_group("fake-lag", sx + 230, sy, 197)) {
+            if (create_group("other", sx + 230, sy, 197)) {
                 ax = sx + 250;
+                e_onpeek = create_checkbox("e-peek", ax, sy + 20, e_onpeek);
             }
         }
     }
@@ -629,6 +660,10 @@ function main() {
                     minimumdamage_override_value_awp = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_awp[1], "hp");
                     minimumdamage_default_value_awp = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_awp[1], "hp");
                 }
+                if (minimumdamage_array_selectedoption == 3) {
+                    minimumdamage_override_value_heavypistols = create_slider("override damage", sx + 20, ay + 110, 0, 130, minimumdamage_override_value_heavypistols[1], "hp");
+                    minimumdamage_default_value_heavypistols = create_slider("reset damage", sx + 20, ay + 145, 0, 130, minimumdamage_default_value_heavypistols[1], "hp");
+                }
                 var minimumdamage_dropdown = create_dropdown("weapon", sx + 20, ay + 70, minimumdamage_array, minimumdamage_array_opened, minimumdamage_array_selectedoption);
                 if (minimumdamage_dropdown != undefined) {
                     if (minimumdamage_dropdown == "closed") {
@@ -650,40 +685,47 @@ function main() {
             }
         }
     }
-}
 
+    if (e_onpeek && IsPeeking()) {
 
-if (legit_triggerbot_hitchance && Input.IsKeyPressed(legit_triggerbot_hitchance_keybind)) {
-    UI.SetValue("Legit", "GENERAL", "Triggerbot", "Hitchance", legit_triggerbot_hitchance_value[0]);
-} else {
-    if (legit_triggerbot_hitchance)
-        UI.SetValue("Legit", "GENERAL", "Triggerbot", "Hitchance", legit_triggerbot_hitchance_resetvalue[0]);
-}
+    }
 
-if (other_noscopedistance && Input.IsKeyPressed(other_noscope_keybind)) {
-    if (UI.GetValue("Rage", "GENERAL", "General", "Auto scope"))
-        UI.SetValue("Rage", "GENERAL", "General", "Auto scope", false);
-} else {
-    if (other_noscopedistance)
-        UI.SetValue("Rage", "GENERAL", "General", "Auto scope", true);
-}
+    if (legit_triggerbot_hitchance && Input.IsKeyPressed(legit_triggerbot_hitchance_keybind)) {
+        UI.SetValue("Legit", "GENERAL", "Triggerbot", "Hitchance", legit_triggerbot_hitchance_value[0]);
+    } else {
+        if (legit_triggerbot_hitchance)
+            UI.SetValue("Legit", "GENERAL", "Triggerbot", "Hitchance", legit_triggerbot_hitchance_resetvalue[0]);
+    }
 
-if (minimumdamage_enable && Input.IsKeyPressed(minimumdamage_keybind)) {
-    var weapon = minimumdamage_array_selectedoption;
-    if (weapon == 0)
-        UI.SetValue("Rage", "AUTOSNIPER", "Targeting", "Minimum damage", minimumdamage_override_value_autosniper[0]);
-    if (weapon == 1)
-        UI.SetValue("Rage", "SCOUT", "Targeting", "Minimum damage", minimumdamage_override_value_scout[0]);
-    if (weapon == 2)
-        UI.SetValue("Rage", "AWP", "Targeting", "Minimum damage", minimumdamage_override_value_awp[0]);
-} else {
-    if (minimumdamage_enable && !Input.IsKeyPressed(minimumdamage_keybind)) {
-        if (UI.GetValue("Rage", "AUTOSNIPER", "Targeting", "Minimum damage") != minimumdamage_default_value_autosniper[0])
-            UI.SetValue("Rage", "AUTOSNIPER", "Targeting", "Minimum damage", minimumdamage_default_value_autosniper[0]);
-        if (UI.GetValue("Rage", "SCOUT", "Targeting", "Minimum damage") != minimumdamage_default_value_scout[0])
-            UI.SetValue("Rage", "SCOUT", "Targeting", "Minimum damage", minimumdamage_default_value_scout[0]);
-        if (UI.GetValue("Rage", "AWP", "Targeting", "Minimum damage") != minimumdamage_default_value_awp[0])
-            UI.SetValue("Rage", "AWP", "Targeting", "Minimum damage", minimumdamage_default_value_awp[0]);
+    if (other_noscopedistance && Input.IsKeyPressed(other_noscope_keybind)) {
+        if (UI.GetValue("Rage", "GENERAL", "General", "Auto scope"))
+            UI.SetValue("Rage", "GENERAL", "General", "Auto scope", false);
+    } else {
+        if (other_noscopedistance)
+            UI.SetValue("Rage", "GENERAL", "General", "Auto scope", true);
+    }
+
+    if (minimumdamage_enable && Input.IsKeyPressed(minimumdamage_keybind)) {
+        var weapon = minimumdamage_array_selectedoption;
+        if (weapon == 0)
+            UI.SetValue("Rage", "AUTOSNIPER", "Targeting", "Minimum damage", minimumdamage_override_value_autosniper[0]);
+        if (weapon == 1)
+            UI.SetValue("Rage", "SCOUT", "Targeting", "Minimum damage", minimumdamage_override_value_scout[0]);
+        if (weapon == 2)
+            UI.SetValue("Rage", "AWP", "Targeting", "Minimum damage", minimumdamage_override_value_awp[0]);
+        if (weapon == 3)
+            UI.SetValue("Rage", "HEAVY PISTOL", "Targeting", "Minimum damage", minimumdamage_override_value_heavypistols[0]);
+    } else {
+        if (minimumdamage_enable && !Input.IsKeyPressed(minimumdamage_keybind)) {
+            if (UI.GetValue("Rage", "AUTOSNIPER", "Targeting", "Minimum damage") != minimumdamage_default_value_autosniper[0])
+                UI.SetValue("Rage", "AUTOSNIPER", "Targeting", "Minimum damage", minimumdamage_default_value_autosniper[0]);
+            if (UI.GetValue("Rage", "SCOUT", "Targeting", "Minimum damage") != minimumdamage_default_value_scout[0])
+                UI.SetValue("Rage", "SCOUT", "Targeting", "Minimum damage", minimumdamage_default_value_scout[0]);
+            if (UI.GetValue("Rage", "AWP", "Targeting", "Minimum damage") != minimumdamage_default_value_awp[0])
+                UI.SetValue("Rage", "AWP", "Targeting", "Minimum damage", minimumdamage_default_value_awp[0]);
+            if (UI.GetValue("Rage", "HEAVY PISTOL", "Targeting", "Minimum damage") != minimumdamage_default_value_heavypistols[0])
+                UI.SetValue("Rage", "HEAVY PISTOL", "Targeting", "Minimum damage", minimumdamage_default_value_heavypistols[0]);
+        }
     }
 }
 
