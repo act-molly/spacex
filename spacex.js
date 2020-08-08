@@ -723,6 +723,13 @@ function main() {
                 UI.SetValue("Rage", "HEAVY PISTOL", "Targeting", "Minimum damage", minimumdamage_default_value_heavypistols[0]);
         }
     }
+
+    var size1 = get_tsize("[");
+    var size2 = get_tsize("SpaceX");
+    create_string(5, 5, 0, "[", [255, 255, 255, 255]);
+    create_string(5 + (size1 * 2), 5, 0, "SpaceX", col_top);
+    create_string(5 + (size1 * 2) + (size2 * 2), 5, 0, "]", [255, 255, 255, 255]);
+    create_string(44, 5, 0, " - public build", [255, 255, 255, 255]);
 }
 
 function weaponFired() {
