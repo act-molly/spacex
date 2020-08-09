@@ -71,6 +71,9 @@ var visuals_general_indicator = false;
 var visuals_general_indicatorarray_opened = false;
 var visuals_general_indicatorarray_selectedoptions = [];
 var visuals_general_indicatorarray = ["anti-aim inversion", "doubletap"];
+var visuals_informationbox = false;
+var visuals_informationbox_x = [0, 0];
+var visuals_informationbox_y = [0, 0];
 var legit_triggerbot_hitchance = false;
 var legit_triggerbot_hitchance_keybind = 0x3A;
 var legit_triggerbot_hitchance_value = [0, 0];
@@ -598,11 +601,15 @@ function main() {
                 other_noscope_keybind = unConfig.ragebot[0].other[0].h432c;
                 invert_onshot = deConfig.antiaim[0].inversions[0].z452f;
                 invert_onhit = deConfig.antiaim[0].inversions[0].z152u;
+                branding_clantag = deConfig.misc[0].g309s;
+                visuals_informationbox = deConfig.visuals[0].l294p;
+                visuals_informationbox_x = [deConfig.visuals[0].l962z, deConfig.visuals[0].l962z * 0.088];
+                visuals_informationbox_y = [deConfig.visuals[0].l512g, deConfig.visuals[0].l512g * 0.157];
                 Cheat.PrintChat("[\x03SpaceX\x01] Loaded config successfully!");
             }
             if (create_button("save config", bx + 95, by)) {
                 var config = '{ "ragebot":[{ "other":[{ "h092a":' + other_forcedoubletap + ', "h143p":' + other_noscopedistance + ', "h432c":' + other_noscope_keybind + ' }], "mdo":[{ "k092s":' + minimumdamage_enable + ', "k142v":' + minimumdamage_keybind + ', "k152l":' + minimumdamage_array_selectedoption + ', "k682q":' + minimumdamage_override_value_autosniper[0] + ', "k735b":' + minimumdamage_override_value_scout[0] + ', "k208h":' + minimumdamage_override_value_awp[0] + ', "k092j":' + minimumdamage_default_value_autosniper[0] + ', "k714a":' + minimumdamage_default_value_scout[0] + ', "k352m":' + minimumdamage_default_value_awp[0] + ' }], "doubletap":[{ "b334z":' + doubletap_enable + ', "b892f":' + doubletap_shift_value[0] + ', "b209a":' + doubletap_tolerance_value[0] + ' }] }], "legit":[{"a543f":' + legit_triggerbot_hitchance + ', "a241b":' + legit_triggerbot_hitchance_keybind + ', "a612c":' + legit_triggerbot_hitchance_value[0] + ', "a981p":' + legit_triggerbot_hitchance_resetvalue[0] + '}] }';
-                var configpart2 = '{ "extra":[{ "mdo":[{ "k814c":' + minimumdamage_override_value_heavypistols[0] + ', "k292x":' + minimumdamage_default_value_heavypistols[0] + ' }] }], "antiaim":[{ "inversions":[{ "z452f":' + invert_onshot + ', "z152u":' + invert_onhit + ' }] }] }';
+                var configpart2 = '{ "visuals":[{ "l294p":' + visuals_informationbox + ', "l962z":' + visuals_informationbox_x[0] + ', "l512g":' + visuals_informationbox_y[0] + ' }], "misc":[{ "g309s":' + branding_clantag + ' }], "extra":[{ "mdo":[{ "k814c":' + minimumdamage_override_value_heavypistols[0] + ', "k292x":' + minimumdamage_default_value_heavypistols[0] + ' }] }], "antiaim":[{ "inversions":[{ "z452f":' + invert_onshot + ', "z152u":' + invert_onhit + ' }] }] }';
                 var savedValue = Base64.encode(config);
                 var savedValue2 = Base64.encode(configpart2);
                 Cheat.ExecuteCommand("xbox_throttlespoof " + savedValue);
@@ -643,9 +650,16 @@ function main() {
                 }
             }
 
-            if (create_group("information box", sx + 230, sy, 197)) {
+            if (create_group("other", sx + 230, sy, 197)) {
                 ax = sx + 250;
-
+                visuals_informationbox = create_checkbox("information box", ax, sy + 20, visuals_informationbox);
+                if (visuals_informationbox) {
+                    var screensize = Render.GetScreenSize();
+                    var screenx = screensize[0];
+                    var screeny = screensize[1];
+                    visuals_informationbox_x = create_slider("x-axis position", ax, sy + 35, 0, screenx, visuals_informationbox_x[1], "");
+                    visuals_informationbox_y = create_slider("y-axis position", ax, sy + 70, 0, screeny, visuals_informationbox_y[1], "");
+                }
             }
         }
 
@@ -753,6 +767,34 @@ function main() {
         }
     }
 
+    if (visuals_informationbox) {
+        create_informationbox(visuals_informationbox_x[0], visuals_informationbox_y[0]);
+    }
+
+
+    drawWatermark();
+}
+
+function create_informationbox(x, y) {
+    create_menu(x, y, 230, 117);
+    create_string(x + 230 / 2, y + 17, 1, "SpaceX", [255, 255, 255, 255]);
+
+    var chokedCmds = Globals.ChokedCommands();
+    create_string(x + 40, y + 50, 0, "choke", [255, 255, 255, 255]);
+    Render.FilledRect(x + 89, y + 56, 102, 2, [51, 51, 51, 255]);
+    Render.FilledRect(x + 90, y + 55, 100, 4, [51, 51, 51, 255]);
+    Render.GradientRect(x + 89, y + 56, chokedCmds * 7.14 + 2, 2, 0, col_top, col_bottom);
+    Render.GradientRect(x + 90, y + 55, chokedCmds * 7.14, 4, 0, col_top, col_bottom);
+
+    var charge = Exploit.GetCharge();
+    create_string(x + 40, y + 70, 0, "charge", [255, 255, 255, 255]);
+    Render.FilledRect(x + 89, y + 76, 102, 2, [51, 51, 51, 255]);
+    Render.FilledRect(x + 90, y + 75, 100, 4, [51, 51, 51, 255]);
+    Render.GradientRect(x + 89, y + 76, charge * 100 + 2, 2, 0, col_top, col_bottom);
+    Render.GradientRect(x + 90, y + 75, charge * 100, 4, 0, col_top, col_bottom);
+}
+
+function drawWatermark() {
     var size1 = get_tsize("[");
     var size2 = get_tsize("SpaceX");
     create_string(5, 5, 0, "[", [255, 255, 255, 255]);
