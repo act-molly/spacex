@@ -5,6 +5,32 @@ var height = 410;//640
 var indropdown = false;
 var col_top = [186, 129, 240, 255];
 var col_bottom = [110, 59, 156, 255];
+var tag = [
+    "5",
+    "5|>",
+    "S|>4",
+    "SP4(",
+    "SPA(3",
+    "SPAC3><",
+    "SPACE><",
+    "SPACEX",
+    "SPACEX",
+    "SPACEX",
+    "SPACEX",
+    "SPACE><",
+    "SPAC3><",
+    "SPA(3",
+    "SP4(",
+    "S|>4",
+    "5|>",
+    "5",
+    " ",
+    " ",
+    " ",
+    " "
+];
+var last_time = 0;
+var index = 0;
 
 var menuopen = true;
 
@@ -49,6 +75,7 @@ var legit_triggerbot_hitchance = false;
 var legit_triggerbot_hitchance_keybind = 0x3A;
 var legit_triggerbot_hitchance_value = [0, 0];
 var legit_triggerbot_hitchance_resetvalue = [UI.GetValue("Legit", "GENERAL", "Triggerbot", "Hitchance"), UI.GetValue("Legit", "GENERAL", "Triggerbot", "Hitchance") / 0.59];
+var branding_clantag = false;
 
 var invert_onshot = false;
 var invert_onhit = false;
@@ -584,6 +611,12 @@ function main() {
             }
         }
 
+        if (misctab) {
+            if (create_group("branding", sx, sy, 317)) {
+                branding_clantag = create_checkbox("SpaceX clantag", sx + 20, sy + 20, branding_clantag);
+            }
+        }
+
         if (ragetab) {
             if (create_group("general", sx, sy, 317)) {
                 legit_triggerbot_hitchance = create_checkbox("triggerbot noscope hitchance", sx + 20, sy + 20, legit_triggerbot_hitchance);
@@ -758,7 +791,22 @@ function ragebotFunction() {
     }
 }
 
+
+function clantag() {
+    if (!branding_clantag) return;
+
+    var now = Math.round(Globals.Curtime() * 3);
+
+    if (now === last_time)
+        return;
+
+    last_time = now;
+    index = Math.round(now % tag.length);
+    Local.SetClanTag(tag[index]);
+}
+
 Cheat.RegisterCallback("Draw", "main");
 Cheat.RegisterCallback("weapon_fire", "weaponFired");
 Cheat.RegisterCallback("player_hurt", "playerHurt");
 Cheat.RegisterCallback("CreateMove", "ragebotFunction");
+Cheat.RegisterCallback("FrameStageNotify", "clantag");
