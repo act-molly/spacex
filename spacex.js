@@ -516,12 +516,8 @@ function IsPeeking(entity) {
 }
 
 function main() {
-    if (Input.IsKeyPressed(0x2D) && Globals.Realtime() > globaltime + 0.2) {
-        globaltime = Globals.Realtime();
-        menuopen = !menuopen;
-    }
 
-    if (menuopen) {
+    if (UI.IsMenuOpen()) {
         create_menu(x, y, width, height);
         var sx = x + 40;
         var sy = y + 55;
