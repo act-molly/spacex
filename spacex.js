@@ -83,9 +83,8 @@ var branding_clantag = false;
 var invert_onshot = false;
 var invert_onhit = false;
 var e_onpeek = false;
-var fakelag_ramp = false;
-var fakelag_ramp_min = [0, 0];
-var fakelag_ramp_max = [0, 0];
+var fakelag_step = false;
+var fakelag_step_delay = [1000, 1000 * 0.034];
 
 var globaltime = Globals.Realtime();
 
@@ -653,12 +652,14 @@ function main() {
             if (create_group("other", sx + 230, sy, 197)) {
                 ax = sx + 250;
                 visuals_informationbox = create_checkbox("information box", ax, sy + 20, visuals_informationbox);
+                var by = 40;
                 if (visuals_informationbox) {
                     var screensize = Render.GetScreenSize();
                     var screenx = screensize[0];
                     var screeny = screensize[1];
                     visuals_informationbox_x = create_slider("x-axis position", ax, sy + 35, 0, screenx, visuals_informationbox_x[1], "");
                     visuals_informationbox_y = create_slider("y-axis position", ax, sy + 70, 0, screeny, visuals_informationbox_y[1], "");
+                    by = 110;
                 }
             }
         }
@@ -672,6 +673,10 @@ function main() {
             if (create_group("other", sx + 230, sy, 197)) {
                 ax = sx + 250;
                 e_onpeek = create_checkbox("e-peek", ax, sy + 20, e_onpeek);
+                fakelag_step = create_checkbox("fakelag step", ax, sy + 40, fakelag_step);
+                if (fakelag_step) {
+                    fakelag_step_delay = create_slider("step delay", ax, sy + 55, 0, 5000, fakelag_step_delay[1], "ms");
+                }
             }
         }
 
@@ -767,9 +772,10 @@ function main() {
         }
     }
 
-    if (visuals_informationbox) {
+    if (visuals_informationbox)
         create_informationbox(visuals_informationbox_x[0], visuals_informationbox_y[0]);
-    }
+    if (fakelag_step)
+        fakelagStep(fakelag_step_delay[0] / 1000);
 
 
     drawWatermark();
@@ -778,20 +784,38 @@ function main() {
 function create_informationbox(x, y) {
     create_menu(x, y, 230, 117);
     create_string(x + 230 / 2, y + 17, 1, "SpaceX", [255, 255, 255, 255]);
-
-    var chokedCmds = Globals.ChokedCommands();
+    var chokedCmds = 0;
+    var charge = 0;
+    if (Entity.IsAlive(Entity.GetLocalPlayer())) {
+        var chokedCmds = Globals.ChokedCommands();
+        var charge = Exploit.GetCharge();
+    }
     create_string(x + 40, y + 50, 0, "choke", [255, 255, 255, 255]);
     Render.FilledRect(x + 89, y + 56, 102, 2, [51, 51, 51, 255]);
     Render.FilledRect(x + 90, y + 55, 100, 4, [51, 51, 51, 255]);
     Render.GradientRect(x + 89, y + 56, chokedCmds * 7.14 + 2, 2, 0, col_top, col_bottom);
     Render.GradientRect(x + 90, y + 55, chokedCmds * 7.14, 4, 0, col_top, col_bottom);
-
-    var charge = Exploit.GetCharge();
     create_string(x + 40, y + 70, 0, "charge", [255, 255, 255, 255]);
     Render.FilledRect(x + 89, y + 76, 102, 2, [51, 51, 51, 255]);
     Render.FilledRect(x + 90, y + 75, 100, 4, [51, 51, 51, 255]);
     Render.GradientRect(x + 89, y + 76, charge * 100 + 2, 2, 0, col_top, col_bottom);
     Render.GradientRect(x + 90, y + 75, charge * 100, 4, 0, col_top, col_bottom);
+}
+
+var steptime = Globals.Realtime();
+
+function fakelagStep(delay) {
+    var fakelag = UI.GetValue("Anti-Aim", "Fake-Lag", "Limit");
+    var newfakelag = fakelag + 1;
+    if (Globals.Realtime() > steptime + delay && fakelag < 14) {
+        steptime = Globals.Realtime();
+        UI.SetValue("Anti-Aim", "Fake-Lag", "Limit", newfakelag);
+    }
+
+    if (fakelag == 14 && Globals.Realtime() > steptime + delay) {
+        steptime = Globals.Realtime();
+        UI.SetValue("Anti-Aim", "Fake-Lag", "Limit", 0);
+    }
 }
 
 function drawWatermark() {
@@ -832,7 +856,6 @@ function ragebotFunction() {
             Ragebot.IgnoreTarget();
     }
 }
-
 
 function clantag() {
     if (!branding_clantag) return;
